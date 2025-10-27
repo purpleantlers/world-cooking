@@ -1,0 +1,12 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Colours */
+  --color-background: #F9F9F9;
+  --color-button: #3D3B8E;
+  --color-card: #6883BA;
+
+
+  /* Typography */
+  --font-inter: 'Inter Tight', system-ui;
+}
