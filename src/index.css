@@ -1,12 +1,17 @@
 @import 'tailwindcss';
 
 @theme {
-  /* Colours */
-  --color-background: #F9F9F9;
-  --color-button: #3D3B8E;
-  --color-card: #6883BA;
+  /* Colors */
+  --color-background: #eff3fb;
+  --color-text: #070e1f;
+  --color-primary: #3e62d3;
+  --color-primary-100: #CCD6F3;
+  --color-secondary: #e6b593;
+  --color-accent: #bcdb60;
+}
 
-
-  /* Typography */
-  --font-inter: 'Inter Tight', system-ui;
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--color-background);
+  text-color: var(--color-text);
 }
