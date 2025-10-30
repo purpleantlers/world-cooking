@@ -1,19 +1,10 @@
-<img
-    src="/public/logo.png"
-    alt="Logo"
-    style="
-      width: 250px;
-      display: flex;
-      margin-inline: auto;
-      margin-bottom: -70px;
-    "
-/>
+<p align=center>
+  <img src=public/logo.png alt=Logo width=250 />
+</p>
 
-<h1 style="text-align: center">World Cooking</h1>
+<h1 align=center>World Cooking</h1>
 
-<h5 style="text-align: center">Explore, Cook and Taste the World</h5>
-
-<br />
+<h5 align=center>Explore, Cook and Taste the World</h5>
 
 <h4>📔 About the Project</h4>
 
@@ -50,7 +41,7 @@
 
 <h4>🥘 Do you want to see it in action?</h4>
 
-<a href="https://purpleantlers.github.io/world-cooking/" style="margin-left: 35px;"><b>World Cooking</b></a>
+<a href=https://purpleantlers.github.io/world-cooking/><b>World Cooking</b></a>
 
 <h4>📝 Do you want a copy?</h4>
 
@@ -83,11 +74,8 @@
 <p>This website is baked in <b>Vite</b>, whisked with <b>React</b> using some <b>Tailwind</b> flavours and served on <b>LocalStorage</b> for a persistent savoury finish.</p>
 
 <h4>👨‍🍳 Contact</h4>
-
-<div style="margin-left: 35px;">
-  <p style="font-size: 14px;">
+   <p>
     <b>Purple Antlers</b>
     <br />
     <i>guerrero.a.eduard@gmail.com</i>
-  </p>
-</div>
+   </p>
