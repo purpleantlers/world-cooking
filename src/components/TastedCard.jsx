@@ -22,7 +22,7 @@ function ExternalLinkIcon() {
 
 function TastedCard({
   country,
-  recipes,
+  recipes = [],
   onDelete,
   onAddRecipe,
   onRemoveRecipe,

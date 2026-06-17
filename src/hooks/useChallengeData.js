@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { world } from '../db'
 import { useLocalStorageState } from './useLocalStorageState'
 
@@ -24,6 +24,7 @@ export const useChallengeData = () => {
   const [countriesTasted, setCountriesTasted] = useLocalStorageState(
     COUNTRIES_TASTED,
     [],
+    migrateCountriesTasted,
   )
   const [challengeRecipes, setChallengeRecipes] = useLocalStorageState(
     CHALLENGE_RECIPES,
@@ -31,14 +32,6 @@ export const useChallengeData = () => {
   )
 
   const ongoingChallenge = !!countryChallenge
-
-  useEffect(() => {
-    setCountriesTasted((prev) => {
-      const needsMigration = prev.some((item) => typeof item === 'string')
-
-      return needsMigration ? migrateCountriesTasted(prev) : prev
-    })
-  }, [setCountriesTasted])
 
   const handleSelectChange = (e) => {
     const newCountry = e.target.value
