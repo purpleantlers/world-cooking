@@ -1,86 +1,157 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { world } from '../db'
+import { useLocalStorageState } from './useLocalStorageState'
 
-// LocalStorage
+// LocalStorage keys
 const COUNTRY_CHALLENGE = 'countryChallenge'
 const COUNTRIES_TASTED = 'countriesTasted'
+const CHALLENGE_RECIPES = 'challengeRecipes'
+
+const migrateCountriesTasted = (storedValue) => {
+  if (!Array.isArray(storedValue)) return []
+
+  return storedValue.map((item) =>
+    typeof item === 'string' ? { country: item, recipes: [] } : item,
+  )
+}
 
 export const useChallengeData = () => {
-  const [ongoingChallenge, setOngoingChallenge] = useState()
   const [selectCountry, setSelectCountry] = useState('none')
-  const [countryChallenge, setCountryChallenge] = useState(() => {
-    const storedData = localStorage.getItem(COUNTRY_CHALLENGE)
+  const [countryChallenge, setCountryChallenge] = useLocalStorageState(
+    COUNTRY_CHALLENGE,
+    '',
+  )
+  const [countriesTasted, setCountriesTasted] = useLocalStorageState(
+    COUNTRIES_TASTED,
+    [],
+  )
+  const [challengeRecipes, setChallengeRecipes] = useLocalStorageState(
+    CHALLENGE_RECIPES,
+    [],
+  )
 
-    return storedData ? JSON.parse(storedData) : ''
-  })
-  const [countriesTasted, setCountriesTasted] = useState(() => {
-    const storedData = localStorage.getItem(COUNTRIES_TASTED)
-
-    return storedData ? JSON.parse(storedData) : []
-  })
+  const ongoingChallenge = !!countryChallenge
 
   useEffect(() => {
-    localStorage.setItem(COUNTRIES_TASTED, JSON.stringify(countriesTasted))
-  }, [countriesTasted])
+    setCountriesTasted((prev) => {
+      const needsMigration = prev.some((item) => typeof item === 'string')
 
-  useEffect(() => {
-    localStorage.setItem(COUNTRY_CHALLENGE, JSON.stringify(countryChallenge))
-    const ongoingChallenge = !!countryChallenge
+      return needsMigration ? migrateCountriesTasted(prev) : prev
+    })
+  }, [setCountriesTasted])
 
-    setOngoingChallenge(ongoingChallenge)
-  }, [countryChallenge])
-
-  const handleSelectChange = useCallback((e) => {
+  const handleSelectChange = (e) => {
     const newCountry = e.target.value
+    const alreadyTasted = countriesTasted.some(
+      (tasted) => tasted.country === newCountry,
+    )
 
-    if (newCountry !== 'none' && !countriesTasted.includes(newCountry)) {
+    if (newCountry !== 'none' && !alreadyTasted) {
       setCountryChallenge(newCountry)
       setSelectCountry('none')
-      setOngoingChallenge(true)
     }
-  })
+  }
 
-  const randomCountry = useCallback(() => {
-    const randomNumber = Math.floor(Math.random() * world.length)
-    const newCountry = world[randomNumber]
+  const randomCountry = () => {
+    const untastedCountries = world.filter(
+      (country) =>
+        !countriesTasted.some((tasted) => tasted.country === country),
+    )
 
-    if (!countriesTasted.includes(newCountry)) {
-      setCountryChallenge(newCountry)
-      setOngoingChallenge(true)
-    } else {
-      randomCountry()
-    }
-  })
+    if (untastedCountries.length === 0) return
 
-  const handleDone = useCallback(() => {
-    setCountriesTasted((prevCountries) => [...prevCountries, countryChallenge])
+    const randomIndex = Math.floor(Math.random() * untastedCountries.length)
+
+    setCountryChallenge(untastedCountries[randomIndex])
+  }
+
+  const addRecipe = (recipeName) => {
+    const trimmedName = recipeName.trim()
+
+    if (!trimmedName) return
+
+    setChallengeRecipes((prevRecipes) => {
+      const alreadyAdded = prevRecipes.some(
+        (recipe) => recipe.toLowerCase() === trimmedName.toLowerCase(),
+      )
+
+      return alreadyAdded ? prevRecipes : [...prevRecipes, trimmedName]
+    })
+  }
+
+  const removeRecipe = (recipeToRemove) => {
+    setChallengeRecipes((prevRecipes) =>
+      prevRecipes.filter((recipe) => recipe !== recipeToRemove),
+    )
+  }
+
+  const handleDone = () => {
+    setCountriesTasted((prevCountries) => [
+      ...prevCountries,
+      { country: countryChallenge, recipes: challengeRecipes },
+    ])
 
     setCountryChallenge('')
-  })
+    setChallengeRecipes([])
+  }
 
-  const handleCancel = useCallback(() => {
+  const handleCancel = () => {
     setCountryChallenge('')
-    setOngoingChallenge(false)
-  })
+    setChallengeRecipes([])
+  }
 
-  const handleReset = useCallback(() => {
-    localStorage.removeItem(COUNTRIES_TASTED)
-    localStorage.removeItem(COUNTRY_CHALLENGE)
-
+  const handleReset = () => {
     setCountriesTasted([])
     setCountryChallenge('')
+    setChallengeRecipes([])
     setSelectCountry('none')
-  }, [])
+  }
 
-  const deleteCountry = useCallback((countryToRemove) => {
+  const deleteCountry = (countryToRemove) => {
     setCountriesTasted((prevCountries) =>
-      prevCountries.filter((country) => country !== countryToRemove)
+      prevCountries.filter((tasted) => tasted.country !== countryToRemove),
     )
-  })
+  }
+
+  const addRecipeToTastedCountry = (country, recipeName) => {
+    const trimmedName = recipeName.trim()
+
+    if (!trimmedName) return
+
+    setCountriesTasted((prevCountries) =>
+      prevCountries.map((tasted) => {
+        if (tasted.country !== country) return tasted
+
+        const alreadyAdded = tasted.recipes.some(
+          (recipe) => recipe.toLowerCase() === trimmedName.toLowerCase(),
+        )
+
+        return alreadyAdded
+          ? tasted
+          : { ...tasted, recipes: [...tasted.recipes, trimmedName] }
+      }),
+    )
+  }
+
+  const removeRecipeFromTastedCountry = (country, recipeToRemove) => {
+    setCountriesTasted((prevCountries) =>
+      prevCountries.map((tasted) =>
+        tasted.country !== country
+          ? tasted
+          : {
+              ...tasted,
+              recipes: tasted.recipes.filter(
+                (recipe) => recipe !== recipeToRemove,
+              ),
+            },
+      ),
+    )
+  }
 
   return {
     countryChallenge,
     countriesTasted,
+    challengeRecipes,
     ongoingChallenge,
     selectCountry,
     handleSelectChange,
@@ -88,6 +159,10 @@ export const useChallengeData = () => {
     handleCancel,
     handleReset,
     deleteCountry,
+    addRecipe,
+    removeRecipe,
+    addRecipeToTastedCountry,
+    removeRecipeFromTastedCountry,
     randomCountry,
     world,
   }

@@ -9,6 +9,7 @@ function App() {
   const {
     countryChallenge,
     countriesTasted,
+    challengeRecipes,
     ongoingChallenge,
     world,
     deleteCountry,
@@ -17,6 +18,10 @@ function App() {
     handleDone,
     handleCancel,
     handleReset,
+    addRecipe,
+    removeRecipe,
+    addRecipeToTastedCountry,
+    removeRecipeFromTastedCountry,
     randomCountry,
   } = useChallengeData()
 
@@ -37,6 +42,9 @@ function App() {
 
           <Challenge
             countryChallenge={countryChallenge}
+            challengeRecipes={challengeRecipes}
+            addRecipe={addRecipe}
+            removeRecipe={removeRecipe}
             done={handleDone}
             cancel={handleCancel}
           />
@@ -44,6 +52,8 @@ function App() {
           <Tasted
             countriesTasted={countriesTasted}
             deleteCountry={deleteCountry}
+            addRecipeToTastedCountry={addRecipeToTastedCountry}
+            removeRecipeFromTastedCountry={removeRecipeFromTastedCountry}
           />
 
           {countriesTasted.length > 0 && <ResetBtn handleReset={handleReset} />}

@@ -57,13 +57,19 @@
    cd world-cooking
    ```
 
-**3. Install the dependencies:**
+**3. Approve builds:**
+
+   ```
+   pnpm approve-builds
+   ```
+
+**4. Install the dependencies:**
 
    ```
    pnpm install
    ```
 
-**4. Start the application:**
+**3. Start the application:**
 
    ```
    pnpm dev

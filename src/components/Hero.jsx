@@ -1,3 +1,5 @@
+import Progress from './Progress'
+
 function Hero({
   selectCountry,
   handleSelectChange,
@@ -30,10 +32,12 @@ function Hero({
           <span className='font-semibold'>Discover country</span> and see where
           the world takes you.
         </p>
+
+        <Progress tasted={countriesTasted.length} total={world.length} />
       </header>
       <section className='flex flex-row gap-2 justify-center'>
         <select
-          className='font-semibold border-2 outline-primary border-primary text-center w-40 p-2 tracking-wide rounded hover:tracking-tight duration-300 appearance-none cursor-pointer disabled:bg-gray-300 disabled:border-none disabled:blur-[1.7px] disabled:hover:tracking-wide disabled:cursor-not-allowed'
+          className='font-semibold border-2 outline-primary border-primary text-center w-40 p-2 tracking-wide rounded hover:bg-primary/20 hover:border-white transition-all duration-300 appearance-none cursor-pointer disabled:bg-gray-300 disabled:border-none disabled:blur-[1.7px] disabled:cursor-not-allowed'
           value={selectCountry}
           onChange={handleSelectChange}
           disabled={ongoingChallenge}
@@ -45,22 +49,26 @@ function Hero({
             Select country
           </option>
           {world.map((country) => {
+            const isTasted = countriesTasted.some(
+              (tasted) => tasted.country === country,
+            )
+
             return (
               <option
                 className='text-sm bg-primary-100 disabled:font-semibold'
                 key={country}
                 value={country}
-                disabled={countriesTasted.includes(country)}
+                disabled={isTasted}
               >
                 {country}
-                {countriesTasted.includes(country) ? ' (Tasted)' : ''}
+                {isTasted ? ' (Tasted)' : ''}
               </option>
             )
           })}
         </select>
         <button
-          className='font-semibold bg-primary text-white text-center w-40 p-2 tracking-wide rounded hover:tracking-tight duration-300 cursor-pointer disabled:bg-gray-300 
-          disabled:text-text disabled:blur-[1.7px] disabled:hover:tracking-wide disabled:cursor-not-allowed'
+          className='font-semibold bg-primary text-white text-center w-40 p-2 tracking-wide rounded hover:bg-primary/80 transition-all duration-300 cursor-pointer disabled:bg-gray-300 
+          disabled:text-text disabled:blur-[1.7px] disabled:cursor-not-allowed'
           onClick={randomCountry}
           disabled={ongoingChallenge}
         >
