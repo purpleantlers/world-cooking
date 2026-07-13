@@ -1,17 +1,99 @@
 @import 'tailwindcss';
+@import 'flag-icons/css/flag-icons.min.css';
 
 @theme {
-  /* Colors */
-  --color-background: #eff3fb;
-  --color-text: #070e1f;
-  --color-primary: #3e62d3;
-  --color-primary-100: #CCD6F3;
-  --color-secondary: #e6b593;
-  --color-accent: #bcdb60;
+  /* ── Palette ── */
+  --color-background: #f5f0e8; /* warm cream */
+  --color-surface: #ffffff; /* card / panel white */
+  --color-text: #1c1714; /* near-black, warm undertone */
+  --color-text-muted: #6b5f58; /* secondary labels */
+
+  --color-primary: #8b2e1a; /* terracotta / dark red — main CTA */
+  --color-primary-100: #e8ddd5; /* primary tint — hover states, pills */
+
+  --color-secondary: #3d5229; /* deep olive green — tags, badges, accents */
+  --color-secondary-100: #d6e4cb; /* olive tint */
+
+  --color-accent: #c4843a; /* warm amber — highlights, active underlines */
+  --color-accent-100: #f2e0c4; /* amber tint */
+
+  --color-border: #ddd5ca; /* subtle dividers */
+
+  --color-purpleantlers: #b303ce;
+
+  /* ── Typography ── */
+  --font-display: 'Georgia', 'Times New Roman', serif;
+  --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
 }
 
+/* ── Base ── */
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: var(--font-body);
   background-color: var(--color-background);
-  text-color: var(--color-text);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Display headings use the serif face */
+h1,
+h2 {
+  font-family: var(--font-display);
+}
+
+/* ── Passport stamps ── */
+.passport-stamp {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 100% !important;
+  background-size: cover !important;
+  background-position: center !important;
+
+  -webkit-mask-image: url('/mask.png');
+  mask-image: url('/mask.png');
+
+  -webkit-mask-size: 15rem;
+  mask-size: 15rem;
+  -webkit-mask-position: start;
+  mask-position: start;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+/* Ink-smudge ring around each stamp.
+   Layered box-shadows simulate uneven ink bleed at the edges —
+   the outermost shadow is faint to evoke a rubber stamp pressed
+   into a passport page. */
+.stamp-ink-ring {
+  border-radius: 50%;
+  position: relative;
+
+  box-shadow:
+    0 0 0 2px #8b2e1a44,
+    0 0 0 3.5px #8b2e1a22,
+    0 0 0 5px #8b2e1a14,
+    0 0 8px 4px #8b2e1a18;
+}
+
+/* Aged ink overlay — warm sepia tint blended over the flag */
+.stamp-ink-ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(196, 132, 58, 0.15) 0%,
+    rgba(139, 46, 26, 0.08) 55%,
+    rgba(139, 46, 26, 0.2) 100%
+  );
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Faint dashed outer ring — like the circular border on a real ink stamp */
+.stamp-ink-outer {
+  border-radius: 50%;
+  border: 1.5px dashed #8b2e1a55;
+  padding: 5px;
 }

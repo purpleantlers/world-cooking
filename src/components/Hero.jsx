@@ -1,81 +1,146 @@
 import Progress from './Progress'
+import PolaroidCarousel from './PolaroidCarousel'
 
 function Hero({
   selectCountry,
   handleSelectChange,
   ongoingChallenge,
+  countryChallenge,
   countriesTasted,
   randomCountry,
   world,
 }) {
   return (
-    <main className='flex flex-col gap-10'>
-      <header className='flex flex-col gap-3'>
-        <h1 className='text-3xl font-medium tracking-wide text-center'>
-          Taste the World
-        </h1>
+    <div className='flex flex-col gap-12'>
+      {/* ── Two-column hero ── */}
+      <section className='grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-center'>
+        <div className='flex flex-col gap-6'>
+          {/* Expedition badge */}
+          <span className='inline-flex items-center gap-1.5 self-start bg-accent-100 text-primary text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded-lg'>
+            <svg
+              width='64'
+              height='64'
+              viewBox='0 0 64 64'
+              fill='none'
+              xmlns='http://www.w3.org/2000/svg'
+              className='w-4 h-4'
+            >
+              <path
+                d='M44.59 41.57L51.59 53.78C51.77 54.09 51.59 54.42 51.36 54.33L42.75 50.83C42.7171 50.8195 42.6823 50.8162 42.6481 50.8203C42.6138 50.8245 42.5808 50.836 42.5514 50.854C42.522 50.872 42.4968 50.8962 42.4776 50.9248C42.4583 50.9535 42.4455 50.986 42.44 51.02L41.38 60.02C41.32 60.31 40.96 60.27 40.78 59.96L32.65 45.25L25.14 60C24.95 60.31 24.61 60.35 24.54 60.07L23.27 50.87C23.2632 50.8369 23.2495 50.8055 23.2297 50.778C23.21 50.7505 23.1846 50.7275 23.1553 50.7105C23.126 50.6935 23.0935 50.6829 23.0598 50.6794C23.0262 50.6758 22.9921 50.6795 22.96 50.69L14.59 54.3C14.31 54.38 14.16 54.06 14.35 53.74L21 42M45.41 11.16L46.27 13.77C46.5265 14.5886 47.0559 15.2946 47.77 15.77L50 17.21C50.7304 17.7007 51.2707 18.4269 51.5309 19.2675C51.7911 20.1081 51.7555 21.0125 51.43 21.83L50.59 23.92C50.2153 24.8435 50.2153 25.8766 50.59 26.8L51.42 28.8C51.7498 29.6003 51.7989 30.4887 51.5592 31.3204C51.3195 32.1521 50.8051 32.8781 50.1 33.38L48.13 34.8C47.4225 35.3087 46.9079 36.0418 46.67 36.88L46 39.32C45.7576 40.1745 45.2265 40.9186 44.4972 41.4255C43.7678 41.9324 42.8853 42.1707 42 42.1L39.9 41.92C38.9129 41.8401 37.9326 42.1406 37.16 42.76L35.16 44.39C34.4757 44.9497 33.619 45.2555 32.735 45.2555C31.851 45.2555 30.9942 44.9497 30.31 44.39L28.54 43C27.8502 42.4311 26.984 42.12 26.09 42.12H23C22.1282 42.1203 21.2825 41.8231 20.6025 41.2776C19.9225 40.7322 19.4489 39.9711 19.26 39.12L18.71 36.77C18.4945 35.8279 17.9299 35.0024 17.13 34.46L15.3 33.19C14.5952 32.7102 14.0702 32.0095 13.8077 31.1984C13.5452 30.3872 13.56 29.5118 13.85 28.71L14.71 26.35C15.0251 25.4914 15.0251 24.5487 14.71 23.69L13.94 21.63C13.6343 20.8086 13.6173 19.9076 13.8917 19.0752C14.1661 18.2428 14.7157 17.5286 15.45 17.05L17.45 15.74C18.2338 15.2287 18.8057 14.4507 19.06 13.55L19.67 11.37C19.9121 10.5147 20.4428 9.76948 21.1719 9.26092C21.901 8.75236 22.7836 8.51178 23.67 8.58003L25.6 8.75003C26.587 8.82995 27.5673 8.52943 28.34 7.91003L30.17 6.43003C30.8565 5.86698 31.717 5.55927 32.605 5.55927C33.4929 5.55927 34.3534 5.86698 35.04 6.43003L36.7 7.81003C37.4662 8.45184 38.4535 8.76777 39.45 8.69003L41.45 8.54003C42.3082 8.46946 43.1653 8.68943 43.8834 9.1646C44.6016 9.63976 45.1393 10.3425 45.41 11.16ZM32.74 16.89L35.44 22.38C35.4481 22.3943 35.4597 22.4063 35.4737 22.4151C35.4876 22.4238 35.5035 22.4289 35.52 22.43L41.52 23.31C41.6 23.31 41.64 23.43 41.58 23.48L37.2 27.75C37.1921 27.7637 37.1879 27.7792 37.1879 27.795C37.1879 27.8108 37.1921 27.8263 37.2 27.84L38.2 33.84C38.2035 33.8581 38.202 33.8768 38.1955 33.8941C38.1891 33.9113 38.1781 33.9265 38.1636 33.9378C38.1491 33.9492 38.1318 33.9564 38.1135 33.9585C38.0952 33.9607 38.0767 33.9577 38.06 33.95L32.64 31.1C32.6273 31.0894 32.6114 31.0836 32.595 31.0836C32.5785 31.0836 32.5626 31.0894 32.55 31.1L27.19 34C27.1727 34.0068 27.154 34.0091 27.1355 34.0067C27.1171 34.0044 27.0996 33.9973 27.0846 33.9864C27.0697 33.9754 27.0577 33.9608 27.0499 33.9439C27.0421 33.9271 27.0387 33.9086 27.04 33.89L28.04 27.89C28.047 27.8761 28.0507 27.8607 28.0507 27.845C28.0507 27.8294 28.047 27.814 28.04 27.8L23.65 23.53C23.6397 23.5156 23.633 23.499 23.6305 23.4815C23.628 23.4639 23.6298 23.4461 23.6357 23.4294C23.6416 23.4127 23.6514 23.3977 23.6643 23.3856C23.6773 23.3735 23.6929 23.3648 23.71 23.36L29.76 22.48C29.7766 22.4799 29.7929 22.4752 29.807 22.4663C29.8212 22.4575 29.8326 22.4449 29.84 22.43L32.55 16.94C32.5483 16.9168 32.5549 16.8938 32.5685 16.8748C32.582 16.8559 32.6018 16.8423 32.6243 16.8364C32.6468 16.8305 32.6707 16.8326 32.6918 16.8424C32.7129 16.8522 32.7299 16.869 32.74 16.89Z'
+                stroke='currentColor'
+                strokeLinecap='round'
+              />
+            </svg>
+            Expedition No. {String(countriesTasted.length + 1).padStart(2, '0')}
+          </span>
 
-        <p className='tracking-wide leading-7 mt-2 text-pretty w-90 md:w-180 md:text-lg md:leading-9 sm:w-130 sm:leading-8'>
-          World Cooking is your passport to an exciting culinary journey! Get
-          ready to explore the{' '}
-          <span className='font-semibold'>
-            culture and cuisine of countries worldwide
-          </span>{' '}
-          and bring a new dish to life right in your kitchen.
-        </p>
-        <p className='text-start tracking-wide leading-7 text-pretty w-90 md:w-180 md:text-lg md:leading-9 sm:w-130 sm:leading-8'>
-          Ready for a specific challenge?{' '}
-          <span className='font-semibold'>Select country</span> and start
-          cooking!
-          <br />
-          Feeling adventurous? Hit{' '}
-          <span className='font-semibold'>Discover country</span> and see where
-          the world takes you.
-        </p>
+          {/* Headline */}
+          <div>
+            <h1 className='text-4xl md:text-5xl font-bold text-text leading-tight'>
+              Taste the World,{' '}
+              <span className='italic text-primary'>One Plate</span> at a Time.
+            </h1>
+          </div>
 
-        <Progress tasted={countriesTasted.length} total={world.length} />
-      </header>
-      <section className='flex flex-row gap-2 justify-center'>
-        <select
-          className='font-semibold border-2 outline-primary border-primary text-center w-40 p-2 tracking-wide rounded hover:bg-primary/20 hover:border-white transition-all duration-300 appearance-none cursor-pointer disabled:bg-gray-300 disabled:border-none disabled:blur-[1.7px] disabled:cursor-not-allowed'
-          value={selectCountry}
-          onChange={handleSelectChange}
-          disabled={ongoingChallenge}
-        >
-          <option
-            className='text-sm bg-primary-100 disabled:font-semibold'
-            value='none'
-          >
-            Select country
-          </option>
-          {world.map((country) => {
-            const isTasted = countriesTasted.some(
-              (tasted) => tasted.country === country,
-            )
+          {/* Description */}
+          <p className='text-text-muted leading-7 max-w-md'>
+            Embark on a culinary odyssey across the continents. Collect
+            authentic recipes, earn regional passport stamps, and master the
+            world's most cherished flavors from your own kitchen.
+          </p>
 
-            return (
-              <option
-                className='text-sm bg-primary-100 disabled:font-semibold'
-                key={country}
-                value={country}
-                disabled={isTasted}
+          {/* CTAs */}
+          <div className='flex flex-wrap gap-3'>
+            {/* Discover Button */}
+            <button
+              onClick={randomCountry}
+              disabled={ongoingChallenge}
+              className='group flex items-center justify-between gap-2 bg-primary text-white text-sm font-medium py-2.5 px-4 w-52 rounded hover:bg-primary/90 transition-colors duration-300 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed'
+            >
+              <span>Discover Country</span>
+              <svg
+                width='24'
+                height='24'
+                viewBox='0 0 24 24'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+                className='w-4 h-4 group-hover:rotate-360 duration-1000 transition-all shrink-0'
               >
-                {country}
-                {isTasted ? ' (Tasted)' : ''}
-              </option>
-            )
-          })}
-        </select>
-        <button
-          className='font-semibold bg-primary text-white text-center w-40 p-2 tracking-wide rounded hover:bg-primary/80 transition-all duration-300 cursor-pointer disabled:bg-gray-300 
-          disabled:text-text disabled:blur-[1.7px] disabled:cursor-not-allowed'
-          onClick={randomCountry}
-          disabled={ongoingChallenge}
-        >
-          Discover country
-        </button>
+                <path
+                  d='M17 7.00001C17 7.00001 14.5 8 13 8.00001C11.5 8.00002 8.99998 9.00001 8.99998 9.00001L7.00001 17C7.00001 17 9.5 15.5 11 15.5C12.5 15.5 15 14 15 14L17 7.00001ZM11.9951 13.5C11.6975 13.5 11.4066 13.4117 11.159 13.2464C10.9116 13.0811 10.7187 12.846 10.6048 12.5711C10.4909 12.2961 10.4611 11.9935 10.5191 11.7016C10.5772 11.4096 10.7205 11.1415 10.931 10.9311C11.1414 10.7206 11.4096 10.5773 11.7015 10.5192C11.9935 10.4611 12.2961 10.4909 12.571 10.6048C12.846 10.7188 13.0811 10.9117 13.2464 11.1591C13.4117 11.4066 13.5 11.6975 13.5 11.9952C13.5 12.3942 13.3414 12.7771 13.0592 13.0592C12.7771 13.3414 12.3942 13.5 11.9951 13.5Z'
+                  fill='currentColor'
+                />
+                <path
+                  d='M20.9999 12C20.9999 10.3312 20.536 8.69752 19.663 7.28028L19.4831 6.99988C18.5561 5.61242 17.2629 4.51181 15.75 3.81837L15.4441 3.6851C13.7995 3.00391 11.9899 2.82568 10.2441 3.17295C8.49831 3.52021 6.89467 4.37738 5.63599 5.63605C4.37732 6.89473 3.52015 8.49837 3.17289 10.2442C2.82562 11.99 3.00385 13.7996 3.68504 15.4442C4.36623 17.0887 5.51978 18.4943 6.99982 19.4832C8.38738 20.4104 10.0037 20.9326 11.6669 20.9942L11.9999 21C14.2378 21 16.3899 20.1669 18.041 18.6719L18.364 18.364C19.9463 16.7816 20.8789 14.6708 20.9892 12.4463L20.9999 12ZM22 12C22 14.6522 20.9466 17.1959 19.0712 19.0713C17.1958 20.9466 14.6522 22 12 22C10.0222 22 8.0888 21.4134 6.44429 20.3145C4.79985 19.2157 3.51756 17.6543 2.76069 15.8272C2.00382 13.9998 1.80648 11.9886 2.19233 10.0488C2.57822 8.10914 3.53022 6.32718 4.92866 4.92872C6.32711 3.53028 8.10908 2.57828 10.0488 2.19239C11.9886 1.80654 13.9998 2.00388 15.8271 2.76075C17.6543 3.51762 19.2156 4.79991 20.3144 6.44435C21.4133 8.08886 22 10.0222 22 12Z'
+                  fill='currentColor'
+                />
+                <path
+                  d='M12 4.00001L11 3.00001H13L12 4.00001Z'
+                  fill='currentColor'
+                />
+                <path d='M20 12L21 11V13L20 12Z' fill='currentColor' />
+                <path d='M12 20L13 21H11L12 20Z' fill='currentColor' />
+                <path
+                  d='M3.99995 12L2.99995 13L2.99995 11L3.99995 12Z'
+                  fill='currentColor'
+                />
+              </svg>
+            </button>
+
+            {/* Select Country Wrapper */}
+            <div className='relative w-52 text-left'>
+              <select
+                value={selectCountry}
+                onChange={handleSelectChange}
+                disabled={ongoingChallenge}
+                className='appearance-none block w-full border border-primary bg-surface text-text text-sm font-medium py-2.5 pl-4 pr-10 rounded hover:bg-primary/5 transition-colors duration-300 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed outline-none truncate'
+              >
+                <option value='none'>Select Country</option>
+                {world.map((country) => {
+                  const isTasted = countriesTasted.some(
+                    (t) => t.country === country,
+                  )
+                  return (
+                    <option key={country} value={country} disabled={isTasted}>
+                      {country}
+                      {isTasted ? ' (Tasted)' : ''}
+                    </option>
+                  )
+                })}
+              </select>
+              {/* Globe icon precisely pinned on the right side matching button padding */}
+              <span className='pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-text-muted'>
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                  className='w-4 h-4'
+                >
+                  <path
+                    d='M12 2C6.47716 2 2 6.47716 2 12C2 17.5228 6.47716 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47716 17.5228 2 12 2ZM20.7191 8.56187H18.127C17.627 5.94825 16.5306 4.30662 15.6714 3.37456C17.97 4.35669 19.7972 6.23241 20.7191 8.56187ZM17.7895 11.5532C17.7895 12.7715 17.6782 13.8527 17.4973 14.8125H12.3125V9.18687H17.6133C17.7241 9.90331 17.7895 10.6888 17.7895 11.5532ZM14.1835 21.1156C13.5802 21.2601 12.9545 21.3459 12.3125 21.3671V15.4375H17.3668C16.4534 19.3551 14.3617 20.9832 14.1835 21.1156ZM10.1421 21.1251C10.1331 21.1187 9.22747 20.4772 8.33391 18.9858C7.84791 18.1746 7.30837 17.0037 6.94531 15.4375H11.6875V21.3671C11.1863 21.3505 10.6949 21.2952 10.2164 21.2027C10.1963 21.1737 10.1727 21.1464 10.1421 21.1251ZM6.52284 11.5532C6.52284 10.6892 6.58125 9.90369 6.68003 9.18687H11.6875V14.8125H6.81453C6.63562 13.8593 6.52284 12.7776 6.52284 11.5532ZM9.66516 2.91941C10.3148 2.75231 10.992 2.65587 11.6875 2.63294V8.56187H6.77975C7.46681 4.77691 9.32253 3.18422 9.66516 2.91941ZM12.3125 8.56187V2.63294C12.9558 2.65412 13.5828 2.74019 14.1873 2.88528C14.1879 2.88563 14.1882 2.88622 14.1887 2.88653C14.2184 2.90416 16.6541 4.40256 17.5014 8.56187H12.3125ZM8.35713 3.36175C7.59084 4.28944 6.60484 5.93459 6.15644 8.56187H3.28088C4.20659 6.22266 6.045 4.3405 8.35713 3.36175ZM3.05678 9.18687H6.06159C5.96825 9.90697 5.91463 10.6938 5.91463 11.5532C5.91463 12.7653 6.01856 13.8468 6.19009 14.8125H3.05659C2.77662 13.9242 2.625 12.9796 2.625 12C2.625 11.0202 2.77669 10.0753 3.05678 9.18687ZM3.28066 15.4375H6.31425C6.93537 18.2665 8.14691 19.9831 8.96588 20.8683C6.36984 19.9776 4.286 17.9785 3.28066 15.4375ZM15.5038 20.6931C16.3143 19.7653 17.4158 18.0905 17.9983 15.4375H20.7193C19.7753 17.8233 17.8808 19.7315 15.5038 20.6931ZM20.9434 14.8125H18.1225C18.294 13.8468 18.398 12.7653 18.398 11.5532C18.398 10.6939 18.3379 9.90697 18.2333 9.18687H20.9432C21.2233 10.0753 21.375 11.0202 21.375 12C21.375 12.9796 21.2233 13.9242 20.9434 14.8125Z'
+                    fill='currentColor'
+                  />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Polaroid carousel */}
+        <div className='w-full'>
+          <PolaroidCarousel />
+        </div>
       </section>
-    </main>
+
+      {/* ── Progress card ── */}
+      <Progress
+        tasted={countriesTasted.length}
+        total={world.length}
+        nextCountry={countryChallenge || null}
+      />
+    </div>
   )
 }
 

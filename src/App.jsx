@@ -1,65 +1,64 @@
-import Hero from './components/Hero'
-import Challenge from './components/Challenge'
-import Tasted from './components/Tasted'
-import ResetBtn from './components/ResetBtn'
+import { Routes, Route } from 'react-router-dom'
+import Nav from './components/Nav'
+import Auth from './components/Auth'
 import Completed from './components/Completed'
+import Home from './pages/Home'
+import ChallengePage from './pages/ChallengePage'
+import Passport from './pages/Passport'
+import Journal from './pages/Journal'
 import { useChallengeData } from './hooks/useChallengeData'
+import { useAuth } from './context/AuthContext'
+import Footer from './components/Footer'
 
 function App() {
+  const { user, loading: authLoading, signOut } = useAuth()
+  const challengeData = useChallengeData(user)
   const {
-    countryChallenge,
     countriesTasted,
-    challengeRecipes,
-    ongoingChallenge,
     world,
-    deleteCountry,
-    selectCountry,
-    handleSelectChange,
-    handleDone,
-    handleCancel,
     handleReset,
-    addRecipe,
-    removeRecipe,
-    addRecipeToTastedCountry,
-    removeRecipeFromTastedCountry,
-    randomCountry,
-  } = useChallengeData()
+    loading: dataLoading,
+  } = challengeData
+
+  if (authLoading || (user && dataLoading)) {
+    return (
+      <div className='flex items-center justify-center min-h-screen'>
+        <p className='text-sm tracking-wide text-text-muted'>Loading…</p>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return <Auth />
+  }
+
+  if (countriesTasted.length >= world.length) {
+    return <Completed handleReset={handleReset} />
+  }
 
   return (
-    <section className='flex flex-col items-center gap-10 min-h-screen h-full py-10 px-10'>
-      {countriesTasted.length >= world.length ? (
-        <Completed handleReset={handleReset} />
-      ) : (
-        <>
-          <Hero
-            selectCountry={selectCountry}
-            handleSelectChange={handleSelectChange}
-            ongoingChallenge={ongoingChallenge}
-            countriesTasted={countriesTasted}
-            randomCountry={randomCountry}
-            world={world}
-          />
+    <div className='min-h-screen flex flex-col'>
+      <Nav onSignOut={signOut} />
 
-          <Challenge
-            countryChallenge={countryChallenge}
-            challengeRecipes={challengeRecipes}
-            addRecipe={addRecipe}
-            removeRecipe={removeRecipe}
-            done={handleDone}
-            cancel={handleCancel}
+      <main className='flex-1'>
+        <Routes>
+          <Route path='/' element={<Home challengeData={challengeData} />} />
+          <Route
+            path='/challenge'
+            element={<ChallengePage challengeData={challengeData} />}
           />
-
-          <Tasted
-            countriesTasted={countriesTasted}
-            deleteCountry={deleteCountry}
-            addRecipeToTastedCountry={addRecipeToTastedCountry}
-            removeRecipeFromTastedCountry={removeRecipeFromTastedCountry}
+          <Route
+            path='/passport'
+            element={<Passport challengeData={challengeData} />}
           />
-
-          {countriesTasted.length > 0 && <ResetBtn handleReset={handleReset} />}
-        </>
-      )}
-    </section>
+          <Route
+            path='/journal'
+            element={<Journal challengeData={challengeData} />}
+          />
+        </Routes>
+      </main>
+      <Footer />
+    </div>
   )
 }
 

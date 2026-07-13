@@ -1,7 +1,6 @@
 {
   "name": "world-cooking",
   "private": true,
-  "homepage": "https://purpleantlers.github.io/world-cooking/",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
@@ -9,15 +8,16 @@
     "build": "vite build",
     "lint": "eslint .",
     "test": "vitest run",
-    "preview": "vite preview",
-    "predeploy": "pnpm run build",
-    "deploy": "gh-pages -d dist"
+    "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.108.2",
     "@tailwindcss/vite": "^4.1.14",
-    "gh-pages": "^6.3.0",
+    "browser-image-compression": "^2.0.2",
+    "flag-icons": "^7.5.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-router-dom": "^7.18.0",
     "tailwindcss": "^4.1.14"
   },
   "devDependencies": {
