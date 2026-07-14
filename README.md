@@ -8,7 +8,7 @@
  
 Live app: **[World Cooking](https://world-cooking.vercel.app/)**
  
----
+<h1></h1>
 
 <h4>📔 About the Project</h4>
 
