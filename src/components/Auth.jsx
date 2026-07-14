@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import Footer from './Footer'
 
-function UtensilsMark() {
+function Logo() {
   return (
     <span className='w-8 h-8 rounded bg-primary flex items-center justify-center shrink-0'>
       <svg
@@ -441,7 +441,7 @@ function Auth() {
           <div className='absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-black/50' />
 
           <div className='relative z-10 flex items-center gap-2'>
-            <UtensilsMark />
+            <Logo />
             <span className='text-lg italic font-semibold text-white tracking-wide'>
               World Cooking
             </span>
@@ -466,7 +466,7 @@ function Auth() {
           <div className='mx-auto w-full max-w-md flex flex-col gap-5'>
             {/* Mobile-only brand mark */}
             <div className='flex lg:hidden items-center gap-2 justify-center'>
-              <UtensilsMark />
+              <Logo />
               <span className='text-lg italic font-semibold text-primary tracking-wide'>
                 World Cooking
               </span>
