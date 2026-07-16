@@ -346,7 +346,7 @@ function EntryModal({ entry, onClose, onUpdate, userId }) {
                   className='w-full border border-border rounded-lg px-3 py-2 text-sm bg-surface outline-none focus:border-primary resize-none'
                 />
               ) : (
-                <p className='text-sm text-text-muted leading-6'>
+                <p className='font-body text-sm text-text-muted leading-6'>
                   {recipe.intro}
                 </p>
               )}
@@ -364,10 +364,10 @@ function EntryModal({ entry, onClose, onUpdate, userId }) {
                   onChange={(e) => setIngredients(e.target.value)}
                   rows={4}
                   maxLength={2000}
-                  className='w-full border border-border rounded-lg px-3 py-2 text-sm bg-surface outline-none focus:border-primary resize-none font-mono'
+                  className='w-full border border-border rounded-lg px-3 py-2 text-sm bg-surface outline-none focus:border-primary resize-none'
                 />
               ) : (
-                <pre className='text-sm text-text-muted leading-6 font-mono whitespace-pre-wrap'>
+                <pre className='font-body text-sm text-text-muted leading-6 whitespace-pre-wrap'>
                   {recipe.ingredients}
                 </pre>
               )}
@@ -388,7 +388,7 @@ function EntryModal({ entry, onClose, onUpdate, userId }) {
                   className='w-full border border-border rounded-lg px-3 py-2 text-sm bg-surface outline-none focus:border-primary resize-none'
                 />
               ) : (
-                <pre className='text-sm text-text-muted leading-6 whitespace-pre-wrap'>
+                <pre className='font-body text-sm text-text-muted leading-6 whitespace-pre-wrap'>
                   {recipe.method}
                 </pre>
               )}
