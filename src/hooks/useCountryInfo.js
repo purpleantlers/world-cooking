@@ -1,22 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
-/**
- * Fetches food culture content for a given country from the country_info table.
- *
- * Returns:
- * {
- *   countryInfo: {
- *     country:      string
- *     food_culture: string
- *     top_dishes:   { name: string, description: string }[]
- *     chefs_tip:    string
- *   } | null,
- *   loading: boolean,
- * }
- *
- * countryInfo is null while loading or if the country has no entry yet.
- */
 export const useCountryInfo = (country) => {
   const [countryInfo, setCountryInfo] = useState(null)
   const [loading, setLoading] = useState(false)

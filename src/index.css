@@ -2,31 +2,31 @@
 @import 'flag-icons/css/flag-icons.min.css';
 
 @theme {
-  /* ── Palette ── */
-  --color-background: #f5f0e8; /* warm cream */
-  --color-surface: #ffffff; /* card / panel white */
-  --color-text: #1c1714; /* near-black, warm undertone */
-  --color-text-muted: #6b5f58; /* secondary labels */
+  /* Palette */
+  --color-background: #f5f0e8;
+  --color-surface: #ffffff;
+  --color-text: #1c1714;
+  --color-text-muted: #6b5f58;
 
-  --color-primary: #8b2e1a; /* terracotta / dark red — main CTA */
-  --color-primary-100: #e8ddd5; /* primary tint — hover states, pills */
+  --color-primary: #8b2e1a;
+  --color-primary-100: #e8ddd5;
 
-  --color-secondary: #3d5229; /* deep olive green — tags, badges, accents */
-  --color-secondary-100: #d6e4cb; /* olive tint */
+  --color-secondary: #3d5229;
+  --color-secondary-100: #d6e4cb;
 
-  --color-accent: #c4843a; /* warm amber — highlights, active underlines */
-  --color-accent-100: #f2e0c4; /* amber tint */
+  --color-accent: #c4843a;
+  --color-accent-100: #f2e0c4;
 
-  --color-border: #ddd5ca; /* subtle dividers */
+  --color-border: #ddd5ca;
 
   --color-purpleantlers: #b303ce;
 
-  /* ── Typography ── */
+  /* Typography */
   --font-display: 'Georgia', 'Times New Roman', serif;
   --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
 }
 
-/* ── Base ── */
+/* Base */
 body {
   font-family: var(--font-body);
   background-color: var(--color-background);
@@ -34,13 +34,12 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Display headings use the serif face */
 h1,
 h2 {
   font-family: var(--font-display);
 }
 
-/* ── Passport stamps ── */
+/* Passport stamps */
 .passport-stamp {
   width: 4rem;
   height: 4rem;
@@ -59,10 +58,7 @@ h2 {
   mask-repeat: no-repeat;
 }
 
-/* Ink-smudge ring around each stamp.
-   Layered box-shadows simulate uneven ink bleed at the edges —
-   the outermost shadow is faint to evoke a rubber stamp pressed
-   into a passport page. */
+/* Ink-smudge ring around each stamp */
 .stamp-ink-ring {
   border-radius: 50%;
   position: relative;
@@ -74,7 +70,7 @@ h2 {
     0 0 8px 4px #8b2e1a18;
 }
 
-/* Aged ink overlay — warm sepia tint blended over the flag */
+/* Aged ink overlay */
 .stamp-ink-ring::after {
   content: '';
   position: absolute;
@@ -91,7 +87,7 @@ h2 {
   z-index: 10;
 }
 
-/* Faint dashed outer ring — like the circular border on a real ink stamp */
+/* Faint dashed outer ring */
 .stamp-ink-outer {
   border-radius: 50%;
   border: 1.5px dashed #8b2e1a55;

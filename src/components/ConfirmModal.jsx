@@ -1,19 +1,3 @@
-/**
- * Reusable confirmation modal — replaces window.confirm() / window.alert()
- * with something that matches the app's design system.
- *
- * Usage:
- * <ConfirmModal
- *   open={showConfirm}
- *   title="Mark challenge as done?"
- *   description="This will save your logged recipes and add a new stamp to your passport."
- *   confirmLabel="Yes, I'm done"
- *   cancelLabel="Keep cooking"
- *   onConfirm={() => { ... }}
- *   onCancel={() => setShowConfirm(false)}
- *   tone="primary" // 'primary' | 'danger'
- * />
- */
 function ConfirmModal({
   open,
   title,

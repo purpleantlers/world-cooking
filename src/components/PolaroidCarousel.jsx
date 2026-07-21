@@ -43,7 +43,7 @@ const slides = [
   },
 ]
 
-// One rotation per slide — extended to cover any slide count
+// One rotation per slide
 const ROTATIONS = [-6, 4, -3, 7, -5, 3, -8, 5, -4, 6]
 
 function getSlideStyle(offset, totalSlides) {

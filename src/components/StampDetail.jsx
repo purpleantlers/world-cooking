@@ -43,8 +43,7 @@ function StampDetail({ tasted, onClose, onDelete }) {
   }
 
   const handleRecipeClick = (recipe) => {
-    // Navigate to journal — the entry_number identifies which card to open
-    // Journal reads this from sessionStorage on mount
+    // Store the entry number in sessionStorage so that the journal page can open the correct entry
     if (recipe.entry_number) {
       sessionStorage.setItem('journal_open_entry', recipe.entry_number)
     }
@@ -63,7 +62,7 @@ function StampDetail({ tasted, onClose, onDelete }) {
           style={{ boxShadow: '0 20px 60px rgba(28,20,16,0.3)' }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header — stamp + country name */}
+          {/* Header */}
           <div className='flex items-center gap-4'>
             {flagCode && (
               <div className='stamp-ink-outer shrink-0'>
@@ -114,7 +113,7 @@ function StampDetail({ tasted, onClose, onDelete }) {
             </span>
           </p>
 
-          {/* Recipes — each links to the journal entry */}
+          {/* Recipes */}
           <div className='flex flex-col gap-2'>
             <span className='text-[10px] font-bold tracking-widest uppercase text-text-muted'>
               Recipes Cooked

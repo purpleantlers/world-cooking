@@ -431,7 +431,7 @@ function Auth() {
   return (
     <div className='min-h-screen'>
       <div className='grid grid-cols-1 lg:grid-cols-2 bg-background lg:h-screen'>
-        {/* ── Left: brand / hero panel ── */}
+        {/* Left: brand / hero panel */}
         <div className='relative hidden lg:flex flex-col justify-between p-8 h-full overflow-hidden'>
           <img
             src='https://images.unsplash.com/photo-1682862279256-b2a9e4f3d22c?w=1200&q=80'
@@ -461,7 +461,7 @@ function Auth() {
           </div>
         </div>
 
-        {/* ── Right: auth panel ── */}
+        {/* Right: auth panel */}
         <div className='flex flex-col justify-center px-6 py-8 sm:px-12 lg:px-16 lg:h-full lg:overflow-y-auto'>
           <div className='mx-auto w-full max-w-md flex flex-col gap-5'>
             {/* Mobile-only brand mark */}
@@ -614,7 +614,7 @@ function Auth() {
           </div>
         </div>
       </div>
-      {/* ── How the Journey Unfolds ── */}
+      {/* How the Journey Unfolds */}
       <section className='bg-background py-16'>
         <div className='max-w-6xl mx-auto px-6'>
           <div className='text-center mb-12'>

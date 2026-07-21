@@ -147,12 +147,12 @@ function Nav({ onSignOut }) {
               }`
             }
           >
-            {/* Show SVG on tiny screens, hide on sm and up */}
+            {/* Show SVG on tiny screens */}
             <span className='sm:hidden' aria-hidden='true'>
               {icon}
             </span>
 
-            {/* Hide text on tiny screens, show on sm and up */}
+            {/* Hide text on tiny screens */}
             <span className='hidden sm:inline'>{label}</span>
 
             {/* Screen reader fallback for accessibility */}

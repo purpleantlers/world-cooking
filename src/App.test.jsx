@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import App from './App'
 
-// Mock Supabase — App requires a real client but tests shouldn't hit the network
+// Mock Supabase
 vi.mock('./lib/supabaseClient', () => ({
   supabase: {
     auth: {
@@ -43,8 +43,7 @@ describe('App', () => {
   })
 
   it('does not crash on first render when countriesTasted was stored in the legacy string-array shape', async () => {
-    // Pre-recipes-feature shape: an array of plain country name strings.
-    // The hook migrates this on load — we just check the app doesn't crash.
+    // Simulate a legacy localStorage value for countriesTasted (array of strings)
     localStorage.setItem('countriesTasted', JSON.stringify(['Canada', 'Peru']))
 
     renderApp()

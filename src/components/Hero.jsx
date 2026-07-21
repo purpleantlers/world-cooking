@@ -12,7 +12,7 @@ function Hero({
 }) {
   return (
     <div className='flex flex-col gap-12'>
-      {/* ── Two-column hero ── */}
+      {/* Two-column hero */}
       <section className='grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-center'>
         <div className='flex flex-col gap-6'>
           {/* Expedition badge */}
@@ -51,13 +51,14 @@ function Hero({
 
           {/* CTAs */}
           <div className='flex flex-wrap gap-3'>
-            {/* Discover Button */}
+            {/* Discover Country */}
             <button
               onClick={randomCountry}
               disabled={ongoingChallenge}
               className='group flex items-center justify-between gap-2 bg-primary text-white text-sm font-medium py-2.5 px-4 w-52 rounded hover:bg-primary/90 transition-colors duration-300 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed'
             >
               <span>Discover Country</span>
+              {/* Compass icon */}
               <svg
                 width='24'
                 height='24'
@@ -87,7 +88,7 @@ function Hero({
               </svg>
             </button>
 
-            {/* Select Country Wrapper */}
+            {/* Select Country */}
             <div className='relative w-52 text-left'>
               <select
                 value={selectCountry}
@@ -108,7 +109,7 @@ function Hero({
                   )
                 })}
               </select>
-              {/* Globe icon precisely pinned on the right side matching button padding */}
+              {/* Globe icon */}
               <span className='pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-text-muted'>
                 <svg
                   width='24'
@@ -134,7 +135,7 @@ function Hero({
         </div>
       </section>
 
-      {/* ── Progress card ── */}
+      {/* Progress card */}
       <Progress
         tasted={countriesTasted.length}
         total={world.length}

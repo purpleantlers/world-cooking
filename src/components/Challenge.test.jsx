@@ -4,8 +4,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import Challenge from './Challenge'
 
-// challengeRecipes is now an array of recipe objects, not strings.
-// updateChallengeRecipe is required for RecipeCard field edits.
+// Helper to create a recipe object with a given name
 const makeRecipe = (name) => ({
   name,
   intro: '',
@@ -26,7 +25,7 @@ const defaultProps = {
   cancel: () => {},
 }
 
-// Challenge uses useNavigate internally via ConfirmModal → needs a Router
+// Helper to render the Challenge component with default props and optional overrides
 const renderChallenge = (props = {}) =>
   render(
     <MemoryRouter>

@@ -4,8 +4,7 @@ import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-// ── Load env vars from scripts/.env ──────────────────────────────────────────
-// Simple manual parser — no dotenv dependency needed
+// Env Variables: Simple manual parser
 const envPath = resolve(__dirname, '.env')
 const envVars = {}
 try {
@@ -17,7 +16,7 @@ try {
     const eqIndex = trimmed.indexOf('=')
     if (eqIndex === -1) continue
     const key = trimmed.slice(0, eqIndex).trim()
-    // Remove any surrounding quotes from the value (common copy-paste issue)
+    // Remove any surrounding quotes from the value
     const value = trimmed
       .slice(eqIndex + 1)
       .trim()
@@ -42,7 +41,7 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !GEMINI_API_KEY) {
   process.exit(1)
 }
 
-// Debug: confirm keys loaded correctly (shows first/last 6 chars only for security)
+// Debug: confirm keys loaded correctly
 const mask = (s) =>
   s ? `${s.slice(0, 6)}...${s.slice(-6)} (${s.length} chars)` : 'MISSING'
 console.log('   SUPABASE_URL:              ', SUPABASE_URL)
@@ -50,7 +49,7 @@ console.log('   SUPABASE_SERVICE_ROLE_KEY: ', mask(SUPABASE_SERVICE_ROLE_KEY))
 console.log('   GEMINI_API_KEY:            ', mask(GEMINI_API_KEY))
 console.log('')
 
-// ── Country list (matches src/db.js exactly) ──────────────────────────────────
+// Country list
 const world = [
   'Afghanistan',
   'Albania',
@@ -250,10 +249,7 @@ const world = [
   'Zimbabwe',
 ]
 
-// ── Supabase REST helpers (direct fetch — avoids any client-level auth issues) ─
-// Using the REST API directly with the service role key in the Authorization
-// header, which is the most reliable way to bypass RLS on Windows.
-
+// Supabase REST API helpers
 const supabaseHeaders = {
   'Content-Type': 'application/json',
   apikey: SUPABASE_SERVICE_ROLE_KEY,
@@ -284,8 +280,7 @@ const supabaseInsert = async (table, row) => {
   }
 }
 
-// ── Gemini call ───────────────────────────────────────────────────────────────
-// const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${GEMINI_API_KEY}`
+// Gemini Call
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${GEMINI_API_KEY}`
 
 const buildPrompt = (
@@ -338,12 +333,12 @@ async function fetchCountryInfo(country) {
   }
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// Helpers
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const pad = (n, width) => String(n).padStart(width, '0')
 
-// ── Main ──────────────────────────────────────────────────────────────────────
+// Main
 async function main() {
   console.log('🌍 World Cooking — Country Info Populator')
   console.log(`   ${world.length} countries to process\n`)
@@ -408,14 +403,13 @@ async function main() {
       failed++
     }
 
-    // Rate limit: wait 4.5s between calls (~13/min, safely under the 15/min limit)
-    // Skip the wait after the last item
+    // Rate limit: wait 4.5s between calls, but skip the wait after the last item
     if (i < remaining.length - 1) {
       await sleep(4500)
     }
   }
 
-  console.log('\n── Summary ──────────────────────────────────────')
+  console.log('\nSummary:')
   console.log(`✅ Succeeded: ${succeeded}`)
   console.log(`❌ Failed:    ${failed}`)
 

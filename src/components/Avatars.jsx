@@ -1,6 +1,5 @@
 import React from 'react'
 
-// 10 distinct color palettes matching your requested profile style
 const PALETTES = {
   'avatar-1': { head: '#8A2BE2', body: '#8A2BE2' },
   'avatar-2': { head: '#0070BB', body: '#0070BB' },

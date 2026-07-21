@@ -11,14 +11,11 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    // Keeps the session in localStorage so the user stays logged in
-    // across page reloads and browser restarts.
+    // Keeps the user logged in across page reloads, so they don't have to log in again.
     persistSession: true,
-    // Silently refreshes the JWT before it expires, so the session
-    // never quietly dies while the tab is open.
+    // Automatically refreshes the session token before it expires, so the user doesn't get logged out in the middle of a session.
     autoRefreshToken: true,
-    // Required for the Google OAuth redirect flow to pick up the
-    // session token from the URL when it bounces back to the app.
+    // When true, Supabase will check the URL for a session when the page loads
     detectSessionInUrl: true,
     storage: window.localStorage,
   },

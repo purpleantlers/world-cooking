@@ -3,9 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-// 2 letters + 8 digits, e.g. "AB12345678" -- styled like a passport number.
-// Not guaranteed globally unique, but collision odds are astronomically
-// low for a hobby app, and it's purely decorative (not a real ID).
+// Generates a random passport number in the format "AB12345678"
 const generatePassportNumber = () => {
   const letters = Array.from(
     { length: 2 },
@@ -62,8 +60,7 @@ export const useProfile = (user) => {
         return
       }
 
-      // First time this account has ever loaded the Passport: create
-      // their profile row now, with a freshly generated passport number.
+      // ç If no profile exists for this user, create one with a random passport number and default avatar.
       const { data: created, error: createError } = await supabase
         .from('profiles')
         .insert({

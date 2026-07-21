@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { countryFlagCodes } from '../utils/countryFlagCodes'
-import { uploadRecipePhoto } from '../hooks/useChallengeData'
+import { uploadRecipePhoto, deleteRecipePhoto } from '../hooks/useChallengeData'
 import { useAuth } from '../context/AuthContext'
 import { countryContinent, CONTINENTS } from '../utils/continents'
+import PhotoCropModal from '../components/PhotoCropModal'
+import { readFileAsDataUrl, getCroppedImageFile } from '../utils/imageCrop'
 
 const ENTRIES_PER_PAGE = 6
 
@@ -37,7 +39,7 @@ const GRADIENTS = [
 ]
 const gradientFor = (index) => GRADIENTS[index % GRADIENTS.length]
 
-// ── Entry card ────────────────────────────────────────────────────────────────
+// Entry card
 function EntryCard({ entry, index, onClick }) {
   const { country, recipe } = entry
   const flagCode = countryFlagCodes[country]
@@ -133,7 +135,7 @@ function EntryCard({ entry, index, onClick }) {
   )
 }
 
-// ── New Adventure CTA card ────────────────────────────────────────────────────
+// New adventure CTA card
 function NewAdventureCard() {
   return (
     <Link
@@ -169,54 +171,148 @@ function NewAdventureCard() {
   )
 }
 
-// ── Detail / Edit modal ───────────────────────────────────────────────────────
+// Detail and Edit modal
 function EntryModal({ entry, onClose, onUpdate, userId }) {
   const { country, recipe } = entry
   const flagCode = countryFlagCodes[country]
 
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [uploading, setUploading] = useState(false)
+  const [processingCrop, setProcessingCrop] = useState(false)
 
   // Edit form state
   const [name, setName] = useState(recipe.name)
   const [intro, setIntro] = useState(recipe.intro ?? '')
   const [ingredients, setIngredients] = useState(recipe.ingredients ?? '')
   const [method, setMethod] = useState(recipe.method ?? '')
-  const [photoUrl, setPhotoUrl] = useState(recipe.photo_url ?? '')
+
+  // The photo currently displayed in the modal, which may be the saved photo or a pending crop preview
+  const [photoSource, setPhotoSource] = useState({
+    src: recipe.photo_url || '',
+    fileName: 'photo.jpg',
+  })
+
+  // Pending photo file and preview URL, which are only set when the user has cropped a new image but not yet saved it
+  const [pendingPhotoFile, setPendingPhotoFile] = useState(null) // File | null
+  const [pendingPreviewUrl, setPendingPreviewUrl] = useState(null) // object URL | null
+
+  // Source currently open in the crop modal: { src, fileName } | null
+  const [cropTarget, setCropTarget] = useState(null)
+
+  // Revoke the pending preview's object URL on unmount so we don't leak memory if the whole modal is closed without saving or cancelling
+  const pendingPreviewUrlRef = useRef(null)
+  useEffect(() => {
+    pendingPreviewUrlRef.current = pendingPreviewUrl
+  }, [pendingPreviewUrl])
+  useEffect(() => {
+    return () => {
+      if (pendingPreviewUrlRef.current) {
+        URL.revokeObjectURL(pendingPreviewUrlRef.current)
+      }
+    }
+  }, [])
+
+  const displayedPhotoUrl = editing
+    ? pendingPreviewUrl || recipe.photo_url
+    : recipe.photo_url
 
   const handlePhotoChange = async (e) => {
     const file = e.target.files?.[0]
-    if (!file || !userId) return
-    setUploading(true)
-    const { url, error } = await uploadRecipePhoto(userId, file)
-    if (url) {
-      setPhotoUrl(url)
-    } else if (error) {
-      alert(error)
+    // Reset the input so selecting the same file again still fires onChange
+    e.target.value = ''
+    if (!file) return
+    try {
+      const src = await readFileAsDataUrl(file)
+      const fileName = file.name || 'photo.jpg'
+      setPhotoSource({ src, fileName })
+      setCropTarget({ src, fileName })
+    } catch {
+      alert('Could not read that image, please try another file.')
     }
-    setUploading(false)
+  }
+
+  // When the user clicks "Adjust crop", we open the crop modal with the current displayed photo as the source
+  const handleAdjustCrop = () => {
+    if (!photoSource.src) return
+    setCropTarget(photoSource)
+  }
+
+  const handleCropCancel = () => setCropTarget(null)
+
+  // Crops the source image on a canvas and keeps the result as a File + preview object URL
+  const handleCropConfirm = async (croppedAreaPixels) => {
+    if (!cropTarget) return
+    setProcessingCrop(true)
+    try {
+      const croppedFile = await getCroppedImageFile(
+        cropTarget.src,
+        croppedAreaPixels,
+        cropTarget.fileName,
+      )
+      if (pendingPreviewUrl) URL.revokeObjectURL(pendingPreviewUrl)
+      setPendingPhotoFile(croppedFile)
+      setPendingPreviewUrl(URL.createObjectURL(croppedFile))
+    } catch {
+      alert('Could not crop that image, please try again.')
+    } finally {
+      setProcessingCrop(false)
+      setCropTarget(null)
+    }
   }
 
   const handleSave = async () => {
     setSaving(true)
+    const previousPhotoUrl = recipe.photo_url
+    let finalPhotoUrl = previousPhotoUrl
+
+    // Only on Save do we actually upload the cropped photo
+    if (pendingPhotoFile) {
+      if (!userId) {
+        alert('Could not upload photo: missing user.')
+        setSaving(false)
+        return
+      }
+      const { url, error } = await uploadRecipePhoto(userId, pendingPhotoFile)
+      if (!url) {
+        alert(error || 'Upload failed. Please try again.')
+        setSaving(false)
+        return
+      }
+      finalPhotoUrl = url
+    }
+
     await onUpdate(recipe.id, {
       name,
       intro,
       ingredients,
       method,
-      photo_url: photoUrl,
+      photo_url: finalPhotoUrl,
     })
+
+    if (previousPhotoUrl && previousPhotoUrl !== finalPhotoUrl) {
+      await deleteRecipePhoto(previousPhotoUrl)
+    }
+
+    if (pendingPreviewUrl) URL.revokeObjectURL(pendingPreviewUrl)
+    setPendingPhotoFile(null)
+    setPendingPreviewUrl(null)
+    setPhotoSource({ src: finalPhotoUrl || '', fileName: 'photo.jpg' })
+
     setSaving(false)
     setEditing(false)
   }
 
   const handleCancel = () => {
+    // Nothing was ever uploaded, so we can just discard the pending crop and reset to the saved photo
+    if (pendingPreviewUrl) URL.revokeObjectURL(pendingPreviewUrl)
+    setPendingPhotoFile(null)
+    setPendingPreviewUrl(null)
+    setPhotoSource({ src: recipe.photo_url || '', fileName: 'photo.jpg' })
+
     setName(recipe.name)
     setIntro(recipe.intro ?? '')
     setIngredients(recipe.ingredients ?? '')
     setMethod(recipe.method ?? '')
-    setPhotoUrl(recipe.photo_url ?? '')
     setEditing(false)
   }
 
@@ -229,7 +325,7 @@ function EntryModal({ entry, onClose, onUpdate, userId }) {
         className='relative bg-background rounded w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl'
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close button — pinned above everything, always reachable */}
+        {/* Close button */}
         <button
           type='button'
           onClick={onClose}
@@ -251,13 +347,13 @@ function EntryModal({ entry, onClose, onUpdate, userId }) {
           </svg>
         </button>
 
-        {/* Scrollable content — photo + body scroll together inside the fixed-height modal */}
+        {/* Scrollable content */}
         <div className='overflow-y-auto'>
           {/* Photo header */}
           <div className='relative w-full h-56 bg-primary-100 shrink-0'>
-            {(editing ? photoUrl : recipe.photo_url) ? (
+            {displayedPhotoUrl ? (
               <img
-                src={editing ? photoUrl : recipe.photo_url}
+                src={displayedPhotoUrl}
                 alt={recipe.name}
                 className='w-full h-full object-cover'
               />
@@ -278,21 +374,33 @@ function EntryModal({ entry, onClose, onUpdate, userId }) {
               </div>
             )}
 
-            {/* Upload button in edit mode */}
+            {/* Upload & crop */}
             {editing && (
-              <label className='absolute bottom-3 right-3 bg-black/60 text-white text-xs font-semibold px-3 py-1.5 rounded cursor-pointer hover:bg-black/80 transition-colors duration-300'>
-                {uploading ? 'Uploading…' : 'Change photo'}
-                <input
-                  type='file'
-                  accept='image/*'
-                  className='hidden'
-                  onChange={handlePhotoChange}
-                />
-              </label>
+              <div className='absolute bottom-3 right-3 flex items-center gap-2'>
+                {displayedPhotoUrl && (
+                  <button
+                    type='button'
+                    onClick={handleAdjustCrop}
+                    disabled={processingCrop}
+                    className='bg-black/60 text-white text-xs font-semibold px-3 py-1.5 rounded cursor-pointer hover:bg-black/80 transition-colors duration-300 disabled:opacity-50'
+                  >
+                    Adjust crop
+                  </button>
+                )}
+                <label className='bg-black/60 text-white text-xs font-semibold px-3 py-1.5 rounded cursor-pointer hover:bg-black/80 transition-colors duration-300'>
+                  {processingCrop ? 'Processing…' : 'Change photo'}
+                  <input
+                    type='file'
+                    accept='image/*'
+                    className='hidden'
+                    onChange={handlePhotoChange}
+                  />
+                </label>
+              </div>
             )}
 
             {/* Entry number badge */}
-            <div className='absolute bottom-3 left-4'>
+            <div className='absolute top-3 left-4'>
               <span className='text-[10px] font-mono font-bold tracking-widest text-white/70 uppercase bg-black/40 px-2 py-1 rounded-full backdrop-blur-sm'>
                 {entryLabel(recipe.entry_number)}
               </span>
@@ -448,6 +556,14 @@ function EntryModal({ entry, onClose, onUpdate, userId }) {
           </div>
         </div>
       </div>
+
+      {cropTarget && (
+        <PhotoCropModal
+          imageSrc={cropTarget.src}
+          onCancel={handleCropCancel}
+          onConfirm={handleCropConfirm}
+        />
+      )}
     </div>
   )
 }
@@ -469,7 +585,7 @@ function ModalSection({ label, show, counter = null, children }) {
   )
 }
 
-// ── Main Journal component ────────────────────────────────────────────────────
+// Main Journal page
 function Journal({ challengeData }) {
   const { user } = useAuth()
   const { countriesTasted, updateRecipe } = challengeData
@@ -555,7 +671,7 @@ function Journal({ challengeData }) {
 
   return (
     <div className='max-w-6xl mx-auto w-full px-6 py-10 flex flex-col gap-8'>
-      {/* ── Header ── */}
+      {/* Header */}
       <div className='flex flex-col gap-6'>
         {allEntries.length > 0 && (
           <>
@@ -689,7 +805,7 @@ function Journal({ challengeData }) {
         )}
       </div>
 
-      {/* ── Grid ── */}
+      {/* Grid */}
       {allEntries.length === 0 ? (
         <div className='flex flex-col items-center gap-6 py-20'>
           <p className='text-text-muted text-sm text-center'>
@@ -728,7 +844,7 @@ function Journal({ challengeData }) {
             {showCTA && <NewAdventureCard />}
           </div>
 
-          {/* ── Pagination ── */}
+          {/* Pagination */}
           {totalPages > 1 && (
             <div className='flex items-center justify-center gap-3 pt-4'>
               <button
@@ -775,7 +891,7 @@ function Journal({ challengeData }) {
         </>
       )}
 
-      {/* ── Entry modal ── */}
+      {/* Entry modal */}
       {selectedEntry && (
         <EntryModal
           entry={selectedEntry}

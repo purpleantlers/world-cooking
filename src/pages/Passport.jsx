@@ -22,7 +22,7 @@ const chunk = (items, size) => {
   return chunks
 }
 
-// ── Ink-smudge stamp ──────────────────────────────────────────────────────────
+// Ink stamp
 function InkStamp({ tasted, index, onClick }) {
   const flagCode = countryFlagCodes[tasted.country]
 
@@ -36,7 +36,7 @@ function InkStamp({ tasted, index, onClick }) {
       className='flex flex-col items-center gap-2 cursor-pointer focus:outline-none group'
       style={{ transform: `rotate(${rotationFor(index)}deg)` }}
     >
-      {/* Outer dashed ring — real stamp border feel */}
+      {/* Outer dashed ring */}
       <div className='stamp-ink-outer'>
         {/* Inner ink-bleed shadow ring */}
         <div className='stamp-ink-ring'>
@@ -50,7 +50,7 @@ function InkStamp({ tasted, index, onClick }) {
         </div>
       </div>
 
-      {/* Country label — mono ink-stamp style */}
+      {/* Country label */}
       <span className='text-[9px] font-mono font-bold tracking-widest uppercase text-center truncate w-20 text-primary/60 group-hover:text-primary transition-colors duration-300'>
         {tasted.country}
       </span>
@@ -73,7 +73,7 @@ function StampGrid({ stamps, onStampClick }) {
   )
 }
 
-// ── Page shell ────────────────────────────────────────────────────────────────
+// Page shell
 const PAGE_BG = '#F8F3E8'
 const COVER_BG = '#1C1410'
 
@@ -124,7 +124,7 @@ function PageShell({ pageNumber, totalPages, isCover = false, children }) {
   )
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
+// Main Passport page
 function Passport({ challengeData }) {
   const { user } = useAuth()
   const { profile, loading: profileLoading, updateProfile } = useProfile(user)
@@ -171,7 +171,7 @@ function Passport({ challengeData }) {
 
   const stampPages = chunk(countriesTasted, STAMPS_PER_PAGE)
 
-  // ── Cover ──
+  // Cover
   const coverPage = (
     <PageShell isCover>
       <div className='flex flex-col items-center justify-around w-full h-full select-none pointer-events-none px-8'>
@@ -272,7 +272,7 @@ function Passport({ challengeData }) {
     </PageShell>
   )
 
-  // ── Profile page ──
+  // Profile
   const profilePage = (totalPages) => (
     <PageShell pageNumber={2} totalPages={totalPages}>
       <div className='w-full h-full flex flex-col justify-between p-4 relative z-30 overflow-hidden'>
@@ -302,7 +302,7 @@ function Passport({ challengeData }) {
     </PageShell>
   )
 
-  // ── Build views ──
+  // Build
   const views = []
 
   if (isMobile) {
@@ -456,7 +456,7 @@ function Passport({ challengeData }) {
 
   return (
     <div className='max-w-4xl mx-auto w-full px-4 py-10 flex flex-col items-center gap-6'>
-      {/* ── Book ── */}
+      {/* Book */}
       <div className='relative flex items-center justify-center w-full'>
         <div
           onPointerDown={handlePointerDown}
@@ -499,7 +499,7 @@ function Passport({ challengeData }) {
         </div>
       </div>
 
-      {/* ── Navigation ── */}
+      {/* Navigation */}
       <div className='flex items-center gap-4 select-none'>
         <button
           type='button'
@@ -546,7 +546,7 @@ function Passport({ challengeData }) {
         </button>
       </div>
 
-      {/* ── Stamp detail modal ── */}
+      {/* Stamp detail modal */}
       <StampDetail
         tasted={selectedCountry}
         onClose={() => setSelectedCountry(null)}

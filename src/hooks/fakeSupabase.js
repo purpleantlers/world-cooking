@@ -1,6 +1,4 @@
-// In-memory fake of the Supabase JS client, updated to return real Promises
-// so async/await in the hook works correctly.
-
+// This is a fake Supabase client for testing purposes. It simulates the behavior of Supabase's query builder and allows you to perform CRUD operations on an in-memory store
 let idCounter = 1
 const nextId = () => `id-${idCounter++}`
 const now = () => new Date().toISOString()
@@ -23,10 +21,10 @@ export function createFakeSupabase() {
     const applyFilters = (rows) =>
       rows.filter((row) => filters.every(([col, val]) => row[col] === val))
 
-    // Returns a thenable that also supports chaining
+    // Returns a promise that resolves to the result of executing the query
     const makeResult = (fn) => {
       const promise = Promise.resolve().then(fn)
-      // Allow further chaining after select/single/maybeSingle
+      // Add the query builder methods to the promise so that they can be chained
       promise.select = (cols) => {
         selectCols = cols
         return promise
@@ -89,7 +87,7 @@ export function createFakeSupabase() {
         return { data: null, error: null }
       }
 
-      // select
+      // Select mode
       let result = applyFilters(table_rows)
 
       if (table === 'tasted_countries' && selectCols?.includes('recipes')) {

@@ -101,7 +101,7 @@ function Home({ challengeData }) {
 
   return (
     <div className='flex flex-col'>
-      {/* ── Hero + Progress ── */}
+      {/* Hero + Progress */}
       <section className='max-w-6xl mx-auto w-full px-6 pt-12 pb-16'>
         <Hero
           selectCountry={selectCountry}
@@ -113,7 +113,7 @@ function Home({ challengeData }) {
           world={world}
         />
 
-        {/* Ongoing challenge nudge */}
+        {/* Ongoing challenge */}
         {ongoingChallenge && (
           <p className='mt-6 text-sm text-text-muted'>
             You have an ongoing challenge:{' '}
@@ -128,7 +128,7 @@ function Home({ challengeData }) {
         )}
       </section>
 
-      {/* ── How the Journey Unfolds ── */}
+      {/* How the Journey Unfolds */}
       <section className='bg-background border-border py-16'>
         <div className='max-w-6xl mx-auto px-6'>
           <div className='text-center mb-12'>
@@ -162,7 +162,7 @@ function Home({ challengeData }) {
         </div>
       </section>
 
-      {/* ── CTA Banner ── */}
+      {/* CTA Banner */}
       <section className='w-full max-w-6xl mx-auto px-6 py-12'>
         <div className='bg-primary rounded-xl overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-8 px-8 py-10 md:px-12 md:py-12'>
           <div className='flex flex-col gap-3 max-w-sm'>
