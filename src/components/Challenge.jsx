@@ -1,9 +1,11 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { getCountrySearchUrl } from '../utils/links'
-import { uploadRecipePhoto } from '../hooks/useChallengeData'
+import { uploadRecipePhoto, deleteRecipePhoto } from '../hooks/useChallengeData'
 import ConfirmModal from './ConfirmModal'
+import PhotoCropModal from './PhotoCropModal'
+import { readFileAsDataUrl, getCroppedImageFile } from '../utils/imageCrop'
 
-// ── Icons ─────────────────────────────────────────────────────────────────────
+// Icons
 function BookIcon() {
   return (
     <svg
@@ -81,36 +83,89 @@ function SkeletonBlock({ className }) {
   return <div className={`bg-primary-100 rounded animate-pulse ${className}`} />
 }
 
-// ── Recipe card (expandable) ───────────────────────────────────────────────────
+// Recipe Card
 function RecipeCard({ recipe, userId, onUpdate, onRemove }) {
   const [open, setOpen] = useState(true)
   const [uploading, setUploading] = useState(false)
   const fileRef = useRef()
 
-  // Local state so typing is instant — no re-render on every keystroke.
-  // onBlur flushes to parent which persists to Supabase.
+  // Local state so typing is instant. onBlur flushes to parent which persists to Supabase
   const [intro, setIntro] = useState(recipe.intro ?? '')
   const [ingredients, setIngredients] = useState(recipe.ingredients ?? '')
   const [method, setMethod] = useState(recipe.method ?? '')
 
   const flush = (key, value) => onUpdate(recipe.name, { [key]: value })
 
+  // Keep a ref to the current photo URL so we can compare against it when uploading a new one or removing
+  const photoUrlRef = useRef(recipe.photo_url ?? '')
+  useEffect(() => {
+    photoUrlRef.current = recipe.photo_url ?? ''
+  }, [recipe.photo_url])
+
+  // Pending file being cropped before upload: { src, fileName } | null
+  const [cropTarget, setCropTarget] = useState(null)
+
   const handlePhotoChange = async (e) => {
     const file = e.target.files?.[0]
+    // Reset the input so selecting the same file again still fires onChange
+    e.target.value = ''
     if (!file || !userId) return
-    setUploading(true)
-    const { url, error } = await uploadRecipePhoto(userId, file)
-    if (url) {
-      onUpdate(recipe.name, { photo_url: url })
-    } else if (error) {
-      alert(error)
+    try {
+      const src = await readFileAsDataUrl(file)
+      setCropTarget({ src, fileName: file.name || 'photo.jpg' })
+    } catch {
+      alert('Could not read that image, please try another file.')
     }
-    setUploading(false)
+  }
+
+  // Re-open the cropper on the photo that's already set, without needing to pick a new file first
+  const handleAdjustCrop = () => {
+    if (!photoUrlRef.current) return
+    setCropTarget({ src: photoUrlRef.current, fileName: 'photo.jpg' })
+  }
+
+  const handleCropCancel = () => setCropTarget(null)
+
+  const handleCropConfirm = async (croppedAreaPixels) => {
+    if (!cropTarget || !userId) return
+    setUploading(true)
+    try {
+      const croppedFile = await getCroppedImageFile(
+        cropTarget.src,
+        croppedAreaPixels,
+        cropTarget.fileName,
+      )
+      const { url, error } = await uploadRecipePhoto(userId, croppedFile)
+      if (url) {
+        const previousUrl = photoUrlRef.current
+        // Update the ref immediately so if the user removes the photo before the parent re-renders, we still know what to delete
+        photoUrlRef.current = url
+        await onUpdate(recipe.name, { photo_url: url })
+        if (previousUrl && previousUrl !== url) {
+          await deleteRecipePhoto(previousUrl)
+        }
+      } else if (error) {
+        alert(error)
+      }
+    } catch {
+      alert('Could not crop that image, please try again.')
+    } finally {
+      setUploading(false)
+      setCropTarget(null)
+    }
+  }
+
+  const handleRemovePhoto = async () => {
+    const previousUrl = photoUrlRef.current
+    photoUrlRef.current = ''
+    await onUpdate(recipe.name, { photo_url: '' })
+    // Clean up the now-unreferenced file in Storage.
+    if (previousUrl) await deleteRecipePhoto(previousUrl)
   }
 
   return (
     <div className='border border-border rounded-xl overflow-hidden bg-background'>
-      {/* Card header — always visible */}
+      {/* Card header */}
       <div className='flex items-center justify-between px-4 py-3'>
         <button
           type='button'
@@ -147,13 +202,24 @@ function RecipeCard({ recipe, userId, onUpdate, onRemove }) {
                   alt={recipe.name}
                   className='w-full h-full object-cover'
                 />
-                <button
-                  type='button'
-                  onClick={() => onUpdate(recipe.name, { photo_url: '' })}
-                  className='absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer'
-                >
-                  Remove
-                </button>
+                <div className='absolute top-2 right-2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
+                  <button
+                    type='button'
+                    onClick={handleAdjustCrop}
+                    disabled={uploading}
+                    className='bg-black/50 text-white text-xs px-2 py-1 rounded-lg cursor-pointer disabled:opacity-50'
+                  >
+                    {uploading ? 'Uploading…' : 'Adjust crop'}
+                  </button>
+                  <button
+                    type='button'
+                    onClick={handleRemovePhoto}
+                    disabled={uploading}
+                    className='bg-black/50 text-white text-xs px-2 py-1 rounded-lg cursor-pointer disabled:opacity-50'
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
             ) : (
               <button
@@ -256,21 +322,19 @@ function RecipeCard({ recipe, userId, onUpdate, onRemove }) {
           </div>
         </div>
       )}
+
+      {cropTarget && (
+        <PhotoCropModal
+          imageSrc={cropTarget.src}
+          onCancel={handleCropCancel}
+          onConfirm={handleCropConfirm}
+        />
+      )}
     </div>
   )
 }
 
-// ── Main Challenge component ───────────────────────────────────────────────────
-/**
- * countryInfo shape (from Supabase `country_info` table):
- * {
- *   country:       string
- *   food_culture:  string
- *   top_dishes:    { name: string, description: string }[]
- *   chefs_tip:     string
- * }
- * Pass countryInfo={null} while the table is being populated.
- */
+// ── Main Challenge component ─────────
 function Challenge({
   countryChallenge,
   challengeRecipes,
@@ -313,11 +377,11 @@ function Challenge({
   return (
     <div className='max-w-6xl mx-auto w-full px-6 py-10'>
       <div className='grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 items-start'>
-        {/* ── Left column — country info (unchanged) ── */}
+        {/* Left column */}
         <div className='flex flex-col gap-6'>
           {/* Country hero */}
           <div className='relative rounded-xl overflow-hidden bg-text h-56 flex items-end'>
-            {/* Background image — shows when countryInfo has an image_url */}
+            {/* Background image */}
             {countryInfo?.image_url && (
               <img
                 src={countryInfo.image_url}
@@ -325,7 +389,7 @@ function Challenge({
                 className='absolute inset-0 w-full h-full object-cover'
               />
             )}
-            {/* Gradient overlay — always present so text is readable */}
+            {/* Gradient overlay */}
             <div className='absolute inset-0 bg-linear-to-t from-black via-black/5 to-transparent z-10' />
             <div className='relative z-20 p-6'>
               <h2 className='text-4xl font-bold text-white'>
@@ -433,7 +497,7 @@ function Challenge({
           </div>
         </div>
 
-        {/* ── Right column — Cook & Document ── */}
+        {/* Right column */}
         <div className='flex flex-col gap-4'>
           {/* Cook & Document card */}
           <div className='bg-surface border border-border rounded-xl p-6 flex flex-col gap-4'>

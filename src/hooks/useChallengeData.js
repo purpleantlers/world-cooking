@@ -3,19 +3,7 @@ import imageCompression from 'browser-image-compression'
 import { world } from '../db'
 import { supabase } from '../lib/supabaseClient'
 
-// ── Recipe shape ──────────────────────────────────────────────────────────────
-// Everywhere in the app a "recipe" is now this object:
-// {
-//   id:           string   — Supabase row id (null while in current_challenge)
-//   name:         string   — required
-//   intro:        string   — optional
-//   ingredients:  string   — optional (free-text block)
-//   method:       string   — optional (free-text block)
-//   photo_url:    string   — optional (public Supabase Storage URL)
-//   entry_number: number   — assigned by DB trigger on insert
-//   cookedAt:     string   — created_at ISO string
-// }
-
+// Recipe
 const emptyRecipe = (name = '') => ({
   id: null,
   name,
@@ -27,7 +15,7 @@ const emptyRecipe = (name = '') => ({
   cookedAt: null,
 })
 
-// ── Legacy migration ──────────────────────────────────────────────────────────
+// Legacy migration
 const migrateCountriesTasted = (storedValue) => {
   if (!Array.isArray(storedValue)) return []
   return storedValue.map((item) =>
@@ -53,7 +41,7 @@ const readLegacyLocalData = () => {
   }
 }
 
-// ── Supabase helpers ──────────────────────────────────────────────────────────
+// Supabase helpers
 const recipeSelect =
   'id, name, intro, ingredients, method, photo_url, entry_number, created_at'
 
@@ -104,10 +92,8 @@ const fetchCurrentChallenge = async (userId) => {
   return data
 }
 
-// ── File signature validation ───────────────────────────────────────────────
-// Checks the actual file bytes (magic numbers) rather than trusting the
-// browser-reported MIME type or file extension, both of which can be
-// spoofed by simply renaming a file. Only PNG and JPEG are accepted.
+// File signature validation
+// Magic bytes for PNG and JPEG files. Used to validate the real file type
 const FILE_SIGNATURES = {
   png: [0x89, 0x50, 0x4e, 0x47], // \x89 P N G
   jpeg: [0xff, 0xd8, 0xff], // JPEG always starts this way
@@ -124,11 +110,9 @@ const detectImageType = async (file) => {
   return null
 }
 
-const MAX_RAW_FILE_SIZE = 15 * 1024 * 1024 // 15MB — sanity ceiling before compression
+const MAX_RAW_FILE_SIZE = 15 * 1024 * 1024 // 15MB
 
-// Compresses the image client-side before upload — keeps Storage and
-// bandwidth usage low on the free tier. Target ~500KB, max 1200px on the
-// longest side, which is more than enough for card and modal display.
+// Photo upload helpers
 const compressPhoto = async (file) => {
   try {
     return await imageCompression(file, {
@@ -143,10 +127,7 @@ const compressPhoto = async (file) => {
   }
 }
 
-// Upload a photo file to Supabase Storage and return { url, error }.
-// Validates the real file type via magic bytes before doing anything else —
-// rejects disguised or non-image files regardless of extension/MIME claim.
-// Path: recipe-photos/{userId}/{timestamp}.jpg
+// Upload a recipe photo to Supabase Storage. Returns the public URL
 export const uploadRecipePhoto = async (userId, file) => {
   if (!file) return { url: null, error: 'No file selected.' }
 
@@ -179,8 +160,8 @@ export const uploadRecipePhoto = async (userId, file) => {
   return { url: data.publicUrl, error: null }
 }
 
-// Delete a photo from Storage by its public URL.
-const deleteRecipePhoto = async (publicUrl) => {
+// Delete a recipe photo from Supabase Storage given its public URL
+export const deleteRecipePhoto = async (publicUrl) => {
   if (!publicUrl) return
   // Extract the path after '/recipe-photos/'
   const marker = '/recipe-photos/'
@@ -190,7 +171,7 @@ const deleteRecipePhoto = async (publicUrl) => {
   await supabase.storage.from('recipe-photos').remove([path])
 }
 
-// ── Legacy import ─────────────────────────────────────────────────────────────
+// Legacy import
 const importLegacyData = async (userId) => {
   const legacy = readLegacyLocalData()
   const hasLegacyData =
@@ -233,14 +214,13 @@ const importLegacyData = async (userId) => {
   return legacy
 }
 
-// ── Hook ──────────────────────────────────────────────────────────────────────
+// Hook
 export const useChallengeData = (user) => {
   const [selectCountry, setSelectCountry] = useState('none')
   const [countryChallenge, setCountryChallenge] = useState('')
   const [countriesTasted, setCountriesTasted] = useState([])
 
-  // challengeRecipes is now an array of recipe objects (not strings).
-  // Each entry matches emptyRecipe() shape, with name filled in.
+  // If the user has no data in Supabase, check localStorage for old data and migrate it to the new schema
   const [challengeRecipes, setChallengeRecipes] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -299,7 +279,7 @@ export const useChallengeData = (user) => {
 
   const ongoingChallenge = !!countryChallenge
 
-  // ── Country selection ──────────────────────────────────────────────────────
+  // Country selection
   const handleSelectChange = async (e) => {
     const newCountry = e.target.value
     const alreadyTasted = countriesTasted.some((t) => t.country === newCountry)
@@ -338,8 +318,8 @@ export const useChallengeData = (user) => {
     setCountryChallenge(chosen)
   }
 
-  // ── In-progress recipe management ─────────────────────────────────────────
-  // addRecipe now accepts a full recipe object or just a name string.
+  // In-progress recipe management
+  // addRecipe now accepts a full recipe object or just a name string
   const addRecipe = async (recipeOrName) => {
     const recipe =
       typeof recipeOrName === 'string'
@@ -366,8 +346,7 @@ export const useChallengeData = (user) => {
     setChallengeRecipes(updated)
   }
 
-  // Update a recipe that's already in the in-progress list (e.g. editing fields
-  // before clicking Done).
+  // Update a recipe that's already in the in-progress list
   const updateChallengeRecipe = async (recipeName, updates) => {
     const updated = challengeRecipes.map((r) =>
       r.name === recipeName ? { ...r, ...updates } : r,
@@ -398,7 +377,7 @@ export const useChallengeData = (user) => {
     setChallengeRecipes(updated)
   }
 
-  // ── Completing a challenge ─────────────────────────────────────────────────
+  // Completing a challenge
   const handleDone = async () => {
     const { data: countryRow, error } = await supabase
       .from('tasted_countries')
@@ -487,7 +466,7 @@ export const useChallengeData = (user) => {
     setSelectCountry('none')
   }
 
-  // ── Post-challenge recipe management (Journal editing) ────────────────────
+  // Post-challenge recipe management
   const getTastedCountryId = async (country) => {
     const { data } = await supabase
       .from('tasted_countries')
@@ -590,8 +569,7 @@ export const useChallengeData = (user) => {
     )
   }
 
-  // Update an already-saved recipe (Journal edit flow).
-  // Pass the recipe id and any fields to update.
+  // Update a recipe that's already in the tasted country list
   const updateRecipe = async (recipeId, updates) => {
     const { intro, ingredients, method, photo_url, name } = updates
 
